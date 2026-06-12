@@ -904,7 +904,7 @@ const FUNC=[
   {nome:'Lucas Admin',cargo:'Diretor TI',sal:12000,tipo:'PJ'},
   {nome:'Rafael Cruz',cargo:'Motorista Sr.',sal:4200,tipo:'CLT'},
 ];
-const ALERTAS=[
+const ALERTAS_LEX=[
   {area:'ANTT',titulo:'Reajuste Frete Minimo Q2/2026',texto:'Portaria ANTT 3.246 ajusta tabela de fretes. Sistema auto-atualizando CPK e margens.',nivel:'MEDIO',data:'01/04/2026',ok:true},
   {area:'CLT',titulo:'Isencao IRRF Ampliada 2026',texto:'IN RFB eleva isencao para R$2.824,00. 4 colaboradores passam a zero IRRF. Folha recalculada.',nivel:'INFO',data:'01/01/2026',ok:true},
   {area:'eSocial',titulo:'Leiaute S-1.2 em vigor',texto:'Atualizacao obrigatoria de eventos eSocial. Checklist gerado automaticamente.',nivel:'ALTO',data:'01/05/2026',ok:true},
@@ -1020,7 +1020,7 @@ var R={
       panel('Score por Area','&#128202;','var(--bl)',
         prog('Fiscal/SPED',97,'#00e87c')+prog('Trabalhista',92,'#00e87c')+
         prog('ANTT/Logistica',96,'#00e87c')+prog('LGPD',85,'#ffb800')+prog('eSocial',91,'#00e87c'))+'</div>';
-    var alerts=ALERTAS.map(function(a,i){
+    var alerts=ALERTAS_LEX.map(function(a,i){
       var nC={INFO:'var(--bl)',MEDIO:'var(--go)',ALTO:'var(--re)'}[a.nivel];
       return '<div style="padding:10px 12px;border-radius:7px;background:'+nC+'08;border:1px solid '+nC+'33;margin-bottom:8px;animation:fadeIn .3s ease '+(i*.08)+'s both">'+
         '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">'+
@@ -1087,7 +1087,7 @@ var R={
     html+='</div>';
     html+='<div style="display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap">';
     [['inbox','MENSAGENS','\uD83D\uDCEC'],['enviar','ENVIAR','\uD83D\uDCE4'],['colaboradores','COLABORADORES','\uD83D\uDC65'],['config','CONFIG','\u2699\uFE0F']].forEach(function(t){
-      html+='<button onclick="HLC._waTab=\\''+t[0]+'\\';HLC.renderTab()" class="tab'+(subTab===t[0]?' ac':'')+'" style="font-size:8px">'+t[2]+' '+t[1]+'</button>';
+      html+='<button onclick="HLC._waTab=\''+t[0]+'\';HLC.renderTab()" class="tab'+(subTab===t[0]?' ac':'')+'" style="font-size:8px">'+t[2]+' '+t[1]+'</button>';
     });
     html+='</div>';
     if(subTab==='inbox')html+=WA.renderInbox(msgs,colab);
@@ -1199,7 +1199,7 @@ var R={
     var keys=Object.keys(CAD_SCHEMA);
     var subtabs='<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">'+keys.map(function(k){
       var s=CAD_SCHEMA[k],ac=ent===k;
-      return '<button onclick="HLC.setCadEntidade(''+k+'')" class="btn" style="background:'+(ac?'rgba(0,200,255,.12)':'rgba(0,0,0,.2)')+';border:1px solid '+(ac?s.cor:'rgba(0,102,255,.2)')+';color:'+(ac?s.cor:'var(--dmL)')+'">'+s.icon+' '+s.titulo+'</button>';
+      return '<button onclick="HLC.setCadEntidade(\''+k+'\')" class="btn" style="background:'+(ac?'rgba(0,200,255,.12)':'rgba(0,0,0,.2)')+';border:1px solid '+(ac?s.cor:'rgba(0,102,255,.2)')+';color:'+(ac?s.cor:'var(--dmL)')+'">'+s.icon+' '+s.titulo+'</button>';
     }).join('')+'</div>';
     return subtabs+WIZARD.render(ent);
   },
@@ -1209,12 +1209,12 @@ var R={
     var dataSrc=schKey==='CAD'?CAD_DATA:FIN_DATA;
     var sch=schSrc[entKey],data=dataSrc[entKey]||[];
     var form=sch.campos.map(function(c){return formCampo(entKey,c);}).join('');
-    var btnSalvar='<button onclick="HLC.salvarRegistro(''+schKey+'',''+entKey+'')" class="btn" style="background:linear-gradient(135deg,'+sch.cor+',rgba(0,0,0,.4));color:#000;font-weight:700;margin-top:10px">\u2705 SALVAR '+sch.singular.toUpperCase()+'</button>';
+    var btnSalvar='<button onclick="HLC.salvarRegistro(\''+schKey+'\',\''+entKey+'\')" class="btn" style="background:linear-gradient(135deg,'+sch.cor+',rgba(0,0,0,.4));color:#000;font-weight:700;margin-top:10px">\u2705 SALVAR '+sch.singular.toUpperCase()+'</button>';
     var painelForm=panel('Novo '+sch.singular,sch.icon,sch.cor,'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">'+form+'</div>'+btnSalvar);
     var head='<thead><tr>'+sch.listCols.map(function(col){var c=sch.campos.find(function(x){return x.i===col;});return '<th>'+(c?c.l:col)+'</th>';}).join('')+'<th style="width:50px">\u00d7</th></tr></thead>';
     var rows=data.length?data.map(function(item){
       var cells=sch.listCols.map(function(col){return '<td style="font-size:10px">'+fmtCampo(item[col],col)+'</td>';}).join('');
-      return '<tr class="row">'+cells+'<td><button onclick="HLC.excluirRegistro(''+schKey+'',''+entKey+'',''+item.id+'')" class="btn sm" style="background:transparent;border:1px solid var(--re)55;color:var(--re);padding:3px 8px">\u00d7</button></td></tr>';
+      return '<tr class="row">'+cells+'<td><button onclick="HLC.excluirRegistro(\''+schKey+'\',\''+entKey+'\',\''+item.id+'\')" class="btn sm" style="background:transparent;border:1px solid var(--re)55;color:var(--re);padding:3px 8px">\u00d7</button></td></tr>';
     }).join(''):'<tr><td colspan="'+(sch.listCols.length+1)+'" style="text-align:center;color:var(--dm);padding:14px;font-size:10px">Nenhum registro.</td></tr>';
     var painelLista=panel(sch.titulo+' ('+data.length+')','\uD83D\uDCCB',sch.cor,'<div style="overflow-x:auto"><table class="tb">'+head+'<tbody>'+rows+'</tbody></table></div>');
     return painelForm+painelLista;
@@ -3143,7 +3143,7 @@ var ALERTAS = {
     html += '<div style="font-size:16px;font-weight:700;color:var(--txB)">Documentos que precisam de atenção</div>';
     html += '<div style="font-size:9.5px;color:var(--dmL);margin-top:2px)">' + alertas.length + ' alerta(s) — ' + (criticos.length ? criticos.length + ' CRÍTICO(S)' : 'nenhum vencido') + '</div>';
     html += '</div>';
-    html += '<button onclick="document.getElementById('alertas-panel').remove()" style="background:rgba(255,51,85,.1);border:1px solid rgba(255,51,85,.3);border-radius:8px;color:var(--re);padding:8px 16px;cursor:pointer;font-size:11px;font-weight:700">ENTENDIDO →</button>';
+    html += '<button onclick="document.getElementById(\'alertas-panel\').remove()" style="background:rgba(255,51,85,.1);border:1px solid rgba(255,51,85,.3);border-radius:8px;color:var(--re);padding:8px 16px;cursor:pointer;font-size:11px;font-weight:700">ENTENDIDO →</button>';
     html += '</div>';
 
     // Resumo em KPIs
@@ -3167,7 +3167,7 @@ var ALERTAS = {
     // Rodapé
     html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(0,102,255,.1);display:flex;justify-content:space-between;align-items:center">';
     html += '<div style="font-size:8.5px;color:var(--dmL)">Documentos vencidos podem resultar em multas, apreensão de veículos e impedimento de emissão de CT-e.</div>';
-    html += '<button onclick="document.getElementById('alertas-panel').remove()" style="background:linear-gradient(135deg,var(--bl),#0044cc);border:none;border-radius:8px;color:#fff;padding:9px 20px;cursor:pointer;font-size:11px;font-weight:700">FECHAR E CONTINUAR</button>';
+    html += '<button onclick="document.getElementById(\'alertas-panel\').remove()" style="background:linear-gradient(135deg,var(--bl),#0044cc);border:none;border-radius:8px;color:#fff;padding:9px 20px;cursor:pointer;font-size:11px;font-weight:700">FECHAR E CONTINUAR</button>';
     html += '</div>';
 
     html += '</div></div>';
@@ -3502,8 +3502,8 @@ var WIZARD = {
         '<span style="font-size:14px">💾</span>' +
         '<div style="flex:1"><div style="font-size:10px;color:var(--go);font-weight:700">RASCUNHO ENCONTRADO</div>' +
         '<div style="font-size:9.5px;color:var(--dmL)">Cadastro incompleto salvo em ' + draft.ts + (draft.dados && draft.dados.nome ? ' — ' + draft.dados.nome : '') + '</div></div>' +
-        '<button onclick="WIZARD.retomar('' + entKey + '')" class="btn sm" style="background:rgba(255,184,0,.15);border:1px solid var(--go);color:var(--go)">↩ CONTINUAR</button>' +
-        '<button onclick="WIZARD.descartarRascunho('' + entKey + '')" class="btn sm" style="background:transparent;border:1px solid var(--re)55;color:var(--re)">✕ DESCARTAR</button>' +
+        '<button onclick="WIZARD.retomar(\'' + entKey + '\')" class="btn sm" style="background:rgba(255,184,0,.15);border:1px solid var(--go);color:var(--go)">↩ CONTINUAR</button>' +
+        '<button onclick="WIZARD.descartarRascunho(\'' + entKey + '\')" class="btn sm" style="background:transparent;border:1px solid var(--re)55;color:var(--re)">✕ DESCARTAR</button>' +
         '</div>';
     }
 
@@ -3528,7 +3528,7 @@ var WIZARD = {
     var html = '<div class="pn" style="border-color:' + cor.replace('var(','').replace(')','') + '22">';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
     html += '<div class="pt" style="color:' + cor + ';margin-bottom:0">' + schema.icon + ' ' + schema.titulo.toUpperCase() + ' <span style="font-size:9px;color:var(--dmL);font-weight:400">(' + data.length + ' registros)</span></div>';
-    html += '<button onclick="WIZARD.iniciar('' + entKey + '')" class="btn" style="background:linear-gradient(135deg,' + cor + ',rgba(0,0,0,.5));color:#000;font-size:9px">+ NOVO ' + schema.singular.toUpperCase() + '</button>';
+    html += '<button onclick="WIZARD.iniciar(\'' + entKey + '\')" class="btn" style="background:linear-gradient(135deg,' + cor + ',rgba(0,0,0,.5));color:#000;font-size:9px">+ NOVO ' + schema.singular.toUpperCase() + '</button>';
     html += '</div>';
 
     if (!data.length) {
@@ -3549,8 +3549,8 @@ var WIZARD = {
         schema.listCols.forEach(function(col) {
           html += '<td style="font-size:10.5px">' + fmtCampo(item[col], col) + '</td>';
         });
-        html += '<td><button onclick="WIZARD.editar('' + entKey + '','' + item.id + '')" class="btn sm" style="background:rgba(0,102,255,.1);border:1px solid var(--bl)44;color:var(--blL);margin-right:3px">✏️</button>';
-        html += '<button onclick="HLC.excluirRegistro('CAD','' + entKey + '','' + item.id + '')" class="btn sm" style="background:transparent;border:1px solid var(--re)44;color:var(--re)">✕</button></td>';
+        html += '<td><button onclick="WIZARD.editar(\'' + entKey + '\',\'' + item.id + '\')" class="btn sm" style="background:rgba(0,102,255,.1);border:1px solid var(--bl)44;color:var(--blL);margin-right:3px">✏️</button>';
+        html += '<button onclick="HLC.excluirRegistro(\'CAD\',\'' + entKey + '\',\'' + item.id + '\')" class="btn sm" style="background:transparent;border:1px solid var(--re)44;color:var(--re)">✕</button></td>';
         html += '</tr>';
       });
       html += '</tbody></table></div>';
@@ -3571,7 +3571,7 @@ var WIZARD = {
     // Header do wizard
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">';
     html += '<div style="display:flex;align-items:center;gap:10px">';
-    html += '<button onclick="WIZARD.cancelar('' + entKey + '')" style="background:transparent;border:none;color:var(--dmL);cursor:pointer;font-size:16px;padding:0">←</button>';
+    html += '<button onclick="WIZARD.cancelar(\'' + entKey + '\')" style="background:transparent;border:none;color:var(--dmL);cursor:pointer;font-size:16px;padding:0">←</button>';
     html += '<div><div style="font-family:Courier New,monospace;font-size:8px;color:var(--dmL);letter-spacing:1px">NOVO ' + schema.singular.toUpperCase() + '</div>';
     html += '<div style="font-size:13px;font-weight:700;color:var(--txB)">' + etapa.icon + ' ' + etapa.titulo + '</div></div>';
     html += '</div>';
@@ -3613,14 +3613,14 @@ var WIZARD = {
         var input = '';
 
         if (schCampo.o) {
-          input = '<select id="' + id + '" onchange="WIZARD.autoSave('' + entKey + '')" style="width:100%;background:rgba(0,102,255,.05);border:1px solid rgba(0,102,255,.2);border-radius:7px;padding:9px 13px;color:var(--txB);font-size:12px">';
+          input = '<select id="' + id + '" onchange="WIZARD.autoSave(\'' + entKey + '\')" style="width:100%;background:rgba(0,102,255,.05);border:1px solid rgba(0,102,255,.2);border-radius:7px;padding:9px 13px;color:var(--txB);font-size:12px">';
           input += '<option value="">Selecione...</option>';
           schCampo.o.forEach(function(o) { input += '<option' + (valAtual === o ? ' selected' : '') + '>' + o + '</option>'; });
           input += '</select>';
         } else if (schCampo.t === 'textarea') {
-          input = '<textarea id="' + id + '" onblur="WIZARD.onBlurCampo('' + entKey + '','' + ci + '')" placeholder="' + (schCampo.p||'') + '" rows="2" style="width:100%;background:rgba(0,102,255,.05);border:1px solid rgba(0,102,255,.2);border-radius:7px;padding:9px 13px;color:var(--txB);font-size:12px;resize:vertical">' + valAtual + '</textarea>';
+          input = '<textarea id="' + id + '" onblur="WIZARD.onBlurCampo(\'' + entKey + '\',\'' + ci + '\')" placeholder="' + (schCampo.p||'') + '" rows="2" style="width:100%;background:rgba(0,102,255,.05);border:1px solid rgba(0,102,255,.2);border-radius:7px;padding:9px 13px;color:var(--txB);font-size:12px;resize:vertical">' + valAtual + '</textarea>';
         } else {
-          input = '<input id="' + id + '" type="' + (schCampo.t||'text') + '" value="' + valAtual + '" placeholder="' + (schCampo.p||'') + '" onblur="WIZARD.onBlurCampo('' + entKey + '','' + ci + '')" style="width:100%;background:rgba(0,102,255,.05);border:1px solid rgba(0,102,255,.2);border-radius:7px;padding:9px 13px;color:var(--txB);font-size:12px"/>';
+          input = '<input id="' + id + '" type="' + (schCampo.t||'text') + '" value="' + valAtual + '" placeholder="' + (schCampo.p||'') + '" onblur="WIZARD.onBlurCampo(\'' + entKey + '\',\'' + ci + '\')" style="width:100%;background:rgba(0,102,255,.05);border:1px solid rgba(0,102,255,.2);border-radius:7px;padding:9px 13px;color:var(--txB);font-size:12px"/>';
         }
 
         html += '<div style="' + span + '">';
@@ -3638,12 +3638,12 @@ var WIZARD = {
     html += '<div style="font-size:9px;color:var(--dmL)">Etapa ' + (etapaAtual+1) + ' de ' + totalEtapas + '</div>';
     html += '<div style="display:flex;gap:8px">';
     if (etapaAtual > 0) {
-      html += '<button onclick="WIZARD.voltar('' + entKey + '')" class="btn" style="background:transparent;border:1px solid rgba(0,102,255,.3);color:var(--blL)">← VOLTAR</button>';
+      html += '<button onclick="WIZARD.voltar(\'' + entKey + '\')" class="btn" style="background:transparent;border:1px solid rgba(0,102,255,.3);color:var(--blL)">← VOLTAR</button>';
     }
     if (isUltima) {
-      html += '<button onclick="WIZARD.salvarFinal('' + entKey + '')" class="btn" style="background:linear-gradient(135deg,var(--gr),#00b85f);color:#000;font-weight:700;font-size:11px">✅ SALVAR ' + schema.singular.toUpperCase() + '</button>';
+      html += '<button onclick="WIZARD.salvarFinal(\'' + entKey + '\')" class="btn" style="background:linear-gradient(135deg,var(--gr),#00b85f);color:#000;font-weight:700;font-size:11px">✅ SALVAR ' + schema.singular.toUpperCase() + '</button>';
     } else {
-      html += '<button onclick="WIZARD.avancar('' + entKey + '')" class="btn" style="background:linear-gradient(135deg,var(--bl),#0044cc);color:#fff;font-weight:700">AVANÇAR →</button>';
+      html += '<button onclick="WIZARD.avancar(\'' + entKey + '\')" class="btn" style="background:linear-gradient(135deg,var(--bl),#0044cc);color:#fff;font-weight:700">AVANÇAR →</button>';
     }
     html += '</div></div>';
     html += '</div>';
